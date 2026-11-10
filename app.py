@@ -67,13 +67,73 @@ print("-"*30)
 # 05 Карточки без лишних полей
 # 1. Напишите short_rows(deliveries). Верните новый список словарей только с id и cargo.
 # 2. Проверьте функцию на результате completed_from с min_price=1500.
+
+def short_rows(deliveries):
+    rows = []
+
+    for delivery in deliveries:
+        rows.append({
+            "id": delivery["id"],
+            "cargo": delivery["cargo"]
+        })
+
+    return rows
+
+
 # 06 Два самых дорогих результата
 # 1. Напишите top_deliveries(deliveries, limit). Отсортируйте полученный список по цене по убыванию и верните первые limit записей.
 # 2. Если limit <= 0, верните []. Если записей меньше limit, верните все. Сначала передайте результат completed_from, а не все доставки.
+
+def top_deliveries(deliveries, limit):
+    if limit <= 0:
+        return []
+
+    ordered = sorted(
+        deliveries,
+        key=lambda delivery: delivery["price"],
+        reverse=True
+    )
+
+    return ordered[:limit]
+
 # 07 Итог завершённых доставок
 # 1. Напишите delivery_summary(deliveries). Верните словарь count и total только по done.
 # 2. Для пустого списка оба значения должны быть нулевыми.
+
+
+def delivery_summary(deliveries):
+    count = 0
+    total = 0
+
+    for delivery in deliveries:
+        if delivery["status"] == "done":
+            count += 1
+            total += delivery["price"]
+
+    return {"count": count, "total": total}
+
+
+print(delivery_summary(data["deliveries"]))
+print(delivery_summary([]))
+
 # 08 Полезный отчёт
 # 1. Напишите export_top_completed(data, min_price, limit), используя completed_from и top_deliveries из предыдущих заданий.
 # 2. Запишите выбранные названия грузов и цены в top_completed.txt. Если выборка пуста, сохраните только заголовок. Верните количество строк доставок.
 # 3. Запустите с min_price=1500 и limit=2. Обновите README и отправьте работу в Git без веток.
+
+def export_top_completed(data, min_price, limit):
+    done = completed_from(data["deliveries"], min_price)
+    top = top_deliveries(done, limit)
+
+    with open("top_completed.txt", "w", encoding="utf-8") as file:
+        file.write("Отчёт завершённых доставок\n")
+
+        for delivery in top:
+            file.write(
+                f'{delivery["cargo"]} - {delivery["price"]} тг\n'
+            )
+
+    return len(top)
+
+
+print(export_top_completed(data, 1500, 2))
